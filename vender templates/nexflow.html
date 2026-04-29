@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexFlow — +1500 Fluxos n8n Prontos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080a0f;
+      --surface: #0e1117;
+      --surface2: #141720;
+      --border: rgba(255,255,255,0.06);
+      --border-bright: rgba(255,255,255,0.12);
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #f472b6;
+      --green: #4ade80;
+      --text: #f0f2f8;
+      --muted: #8b90a0;
+      --glow: rgba(99,102,241,0.3);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 5%;
+      background: rgba(8,10,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-logo span { -webkit-text-fill-color: var(--text); opacity: 0.5; }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.85rem;
+      padding: 0.6rem 1.4rem; border-radius: 8px;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: all 0.2s; letter-spacing: 0.02em;
+    }
+    .nav-cta:hover { background: #4f52e0; transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 7rem 5% 4rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-glow2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 70%);
+      top: 20%; right: 10%;
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3);
+      color: #a5b4fc; font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; padding: 0.4rem 1rem; border-radius: 100px;
+      margin-bottom: 2rem; letter-spacing: 0.08em;
+      animation: fadeDown 0.6s ease both;
+    }
+    .badge::before { content: '●'; color: var(--green); font-size: 0.6rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      max-width: 560px;
+      font-size: 1.1rem; line-height: 1.7;
+      color: var(--muted);
+      margin: 0 auto 2.5rem;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+    .hero-actions {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      justify-content: center;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #8183f4);
+      color: #fff; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      padding: 1rem 2.2rem; border-radius: 12px;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+      box-shadow: 0 0 30px rgba(99,102,241,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(99,102,241,0.55);
+    }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: transparent;
+      color: var(--text); font-family: 'Syne', sans-serif;
+      font-weight: 600; font-size: 1rem;
+      padding: 1rem 2rem; border-radius: 12px;
+      border: 1px solid var(--border-bright); cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover { background: var(--surface); border-color: rgba(255,255,255,0.2); }
+
+    .hero-price-note {
+      margin-top: 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+    .hero-price-note strong { color: var(--green); }
+
+    /* ── SCROLL MARQUEE ── */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 0;
+      background: var(--surface);
+    }
+    .marquee-track {
+      display: flex; gap: 3rem;
+      animation: marquee 20s linear infinite;
+      width: max-content;
+    }
+    .marquee-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; color: var(--muted);
+      white-space: nowrap; letter-spacing: 0.1em;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .marquee-item::before { content: '◆'; color: var(--accent); font-size: 0.5rem; }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ── SECTIONS ── */
+    section { padding: 5rem 5%; position: relative; }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em;
+      color: var(--accent2); text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.1; margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--muted); font-size: 1rem; max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* ── STATS ROW ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 4rem 0;
+    }
+    .stat-item {
+      background: var(--surface);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem; font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-desc { color: var(--muted); font-size: 0.82rem; margin-top: 0.3rem; }
+
+    /* ── TAGS GRID ── */
+    .tags-section { text-align: center; padding: 3rem 5%; }
+    .tags-grid {
+      display: flex; flex-wrap: wrap;
+      gap: 0.75rem; justify-content: center;
+      max-width: 700px; margin: 2rem auto 0;
+    }
+    .tag {
+      padding: 0.6rem 1.4rem;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 0.9rem;
+      border: 1px solid;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+    }
+    .tag:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .tag-purple  { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+    .tag-green   { background: rgba(74,222,128,0.1);  border-color: rgba(74,222,128,0.3); color: #86efac; }
+    .tag-pink    { background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.3); color: #f9a8d4; }
+    .tag-red     { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3); color: #fca5a5; }
+    .tag-blue    { background: rgba(96,165,250,0.1);  border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+    .tag-orange  { background: rgba(251,146,60,0.1);  border-color: rgba(251,146,60,0.3); color: #fdba74; }
+    .tag-teal    { background: rgba(34,211,238,0.1);  border-color: rgba(34,211,238,0.3); color: #67e8f9; }
+    .tag-yellow  { background: rgba(250,204,21,0.1);  border-color: rgba(250,204,21,0.3); color: #fde047; }
+    .tag-gray    { background: rgba(148,163,184,0.1); border-color: rgba(148,163,184,0.3); color: #cbd5e1; }
+    .tag-cyan    { background: rgba(34,211,238,0.12); border-color: rgba(34,211,238,0.35); color: #a5f3fc; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.8rem;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .feature-card:hover {
+      border-color: rgba(99,102,241,0.4);
+      transform: translateY(-3px);
+    }
+    .feature-icon {
+      width: 44px; height: 44px;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 1.1rem;
+    }
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .feature-text { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+    /* ── PRICING ── */
+    .pricing-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-inner {
+      max-width: 500px; margin: 0 auto; text-align: center;
+    }
+    .price-card {
+      background: var(--bg);
+      border: 1px solid rgba(99,102,241,0.4);
+      border-radius: 24px; padding: 3rem 2.5rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 0 60px rgba(99,102,241,0.12);
+      margin-top: 3rem;
+    }
+    .price-card::before {
+      content: '';
+      position: absolute; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 200px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .price-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), #8183f4);
+      color: #fff; font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em;
+      padding: 0.35rem 0.9rem; border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+    .price-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem; font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .price-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    .price-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 4rem; font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+    .price-amount sup {
+      font-size: 1.5rem; vertical-align: super;
+      font-weight: 600; letter-spacing: 0;
+    }
+    .price-once {
+      color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem;
+      font-family: 'DM Mono', monospace;
+    }
+    .price-compare {
+      font-size: 0.78rem; color: var(--muted);
+      margin-top: 0.4rem;
+      text-decoration: line-through;
+    }
+    .price-features {
+      list-style: none;
+      margin: 2rem 0; text-align: left;
+    }
+    .price-features li {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem; color: var(--muted);
+    }
+    .price-features li:last-child { border-bottom: none; }
+    .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .price-features li strong { color: var(--text); }
+
+    .btn-buy {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), #8183f4);
+      color: #fff; font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.1rem;
+      padding: 1.1rem; border-radius: 12px;
+      border: none; cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 0 30px rgba(99,102,241,0.4);
+      letter-spacing: -0.01em;
+    }
+    .btn-buy:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 50px rgba(99,102,241,0.6);
+    }
+    .price-guarantee {
+      margin-top: 1.2rem;
+      font-size: 0.78rem; color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .price-guarantee span { color: var(--green); }
+
+    /* ── COMPARISON TABLE ── */
+    .comparison {
+      max-width: 780px; margin: 3rem auto 0;
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .cmp-head {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      background: var(--surface2);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .cmp-head div, .cmp-row div {
+      padding: 0.9rem 1.2rem;
+      border-right: 1px solid var(--border);
+    }
+    .cmp-head div:last-child, .cmp-row div:last-child { border-right: none; }
+    .cmp-head .highlight { color: var(--accent); }
+    .cmp-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .cmp-row:hover { background: rgba(255,255,255,0.02); }
+    .cmp-row .yes { color: var(--green); }
+    .cmp-row .no  { color: #ef4444; }
+    .cmp-row .col1 { color: var(--muted); }
+
+    /* ── SUPPORT NOTICE ── */
+    .support-section {
+      max-width: 700px; margin: 0 auto; text-align: center;
+    }
+    .support-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; margin-top: 2.5rem;
+    }
+    .support-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem;
+      text-align: left; transition: border-color 0.2s;
+    }
+    .support-card:hover { border-color: var(--border-bright); }
+    .support-card-head {
+      display: flex; align-items: center; gap: 0.7rem;
+      margin-bottom: 0.8rem;
+    }
+    .support-card-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .icon-email { background: rgba(99,102,241,0.15); }
+    .icon-wa    { background: rgba(74,222,128,0.1); }
+    .support-card-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem; font-weight: 700;
+    }
+    .support-card-sub { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .support-card-cta {
+      display: inline-block; margin-top: 0.9rem;
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+      color: var(--accent); letter-spacing: 0.05em;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(99,102,241,0.3);
+      padding-bottom: 1px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .support-card-cta:hover { color: var(--accent2); border-color: var(--accent2); }
+    .support-note {
+      margin-top: 1.2rem;
+      background: rgba(74,222,128,0.06);
+      border: 1px solid rgba(74,222,128,0.15);
+      border-radius: 12px; padding: 1rem 1.3rem;
+      font-size: 0.82rem; color: var(--muted);
+      text-align: left;
+    }
+    .support-note strong { color: var(--green); }
+
+    /* ── FAQ ── */
+    .faq-list { margin-top: 2.5rem; max-width: 700px; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 0.8rem;
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .faq-item:hover { border-color: var(--border-bright); }
+    .faq-q {
+      width: 100%; text-align: left;
+      background: var(--surface); border: none;
+      color: var(--text); cursor: pointer;
+      padding: 1.1rem 1.4rem;
+      font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem;
+    }
+    .faq-q::after { content: '+'; font-size: 1.2rem; color: var(--accent); flex-shrink: 0; }
+    .faq-item.open .faq-q::after { content: '−'; }
+    .faq-a {
+      display: none; padding: 0 1.4rem 1.2rem;
+      color: var(--muted); font-size: 0.88rem; line-height: 1.65;
+      background: var(--surface);
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 5%;
+      display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: space-between;
+      gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-links {
+      display: flex; gap: 1.8rem;
+    }
+    .footer-links a {
+      color: var(--muted); font-size: 0.82rem;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy {
+      color: var(--muted); font-size: 0.78rem;
+      font-family: 'DM Mono', monospace;
+      width: 100%;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .support-cards { grid-template-columns: 1fr; }
+      .cmp-head div, .cmp-row div { padding: 0.7rem 0.7rem; font-size: 0.76rem; }
+      footer { flex-direction: column; align-items: flex-start; }
+      .hero h1 { font-size: clamp(2.2rem, 9vw, 3.5rem); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Nex<span>Flow</span></div>
+  <a href="#comprar" class="nav-cta">Comprar Agora →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="badge">Kit Templates PRO · Testados em Produção</div>
+
+  <h1>+1500 Fluxos n8n<br/><em>Prontos para Usar.</em></h1>
+
+  <p>
+    Pare de construir do zero. Importe, adapte e automatize em minutos com
+    os melhores fluxos n8n testados em produção real — cobrindo IA, WhatsApp,
+    Instagram, email, CRM e muito mais.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#comprar" class="btn-primary">
+      🚀 Comprar o Kit Completo
+    </a>
+    <a href="#fluxos" class="btn-secondary">
+      Ver o que está incluído ↓
+    </a>
+  </div>
+
+  <p class="hero-price-note">
+    Pagamento único · <strong>Sem mensalidade</strong> · Acesso imediato ao download
+  </p>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">IA &amp; LLM Agents</span>
+    <span class="marquee-item">WhatsApp Business</span>
+    <span class="marquee-item">Instagram DM</span>
+    <span class="marquee-item">Email Marketing</span>
+    <span class="marquee-item">YouTube Automation</span>
+    <span class="marquee-item">Telegram Bots</span>
+    <span class="marquee-item">Notion Sync</span>
+    <span class="marquee-item">WordPress</span>
+    <span class="marquee-item">Supabase</span>
+    <span class="marquee-item">OpenAI</span>
+    <span class="marquee-item">CRM Pipelines</span>
+    <span class="marquee-item">Lead Generation</span>
+    <span class="marquee-item">IA &amp; LLM Agents</span>
+    <span class="marquee-item">WhatsApp Business</span>
+    <span class="marquee-item">Instagram DM</span>
+    <span class="marquee-item">Email Marketing</span>
+    <span class="marquee-item">YouTube Automation</span>
+    <span class="marquee-item">Telegram Bots</span>
+    <span class="marquee-item">Notion Sync</span>
+    <span class="marquee-item">WordPress</span>
+    <span class="marquee-item">Supabase</span>
+    <span class="marquee-item">OpenAI</span>
+    <span class="marquee-item">CRM Pipelines</span>
+    <span class="marquee-item">Lead Generation</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<section style="padding: 4rem 5%;">
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-num">+1500</div>
+      <div class="stat-desc">Fluxos incluídos no kit</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">11+</div>
+      <div class="stat-desc">Plataformas e integrações</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-desc">Testados em produção real</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1×</div>
+      <div class="stat-desc">Pagamento único, sem renovação</div>
+    </div>
+  </div>
+</section>
+
+<!-- TAGS / CATEGORIAS -->
+<section id="fluxos" class="tags-section">
+  <p class="section-label">Categorias de Fluxo</p>
+  <h2 class="section-title" style="text-align:center">Tudo o que você precisa<br/>para automatizar</h2>
+  <p class="section-sub" style="margin: 0 auto; text-align:center">
+    Cada fluxo é um arquivo <strong>.json</strong> pronto para importar no n8n —
+    sem configuração complexa, sem dependências pagas extra.
+  </p>
+  <div class="tags-grid">
+    <span class="tag tag-purple">🤖 IA / LLM</span>
+    <span class="tag tag-green">💬 WhatsApp Business</span>
+    <span class="tag tag-pink">📸 Instagram</span>
+    <span class="tag tag-red">▶️ YouTube</span>
+    <span class="tag tag-blue">📧 Email</span>
+    <span class="tag tag-orange">⚙️ N8N Avançado</span>
+    <span class="tag tag-teal">✈️ Telegram</span>
+    <span class="tag tag-yellow">📋 Notion</span>
+    <span class="tag tag-gray">🌐 WordPress</span>
+    <span class="tag tag-cyan">🗄️ Supabase</span>
+    <span class="tag tag-purple">🧠 OpenAI</span>
+    <span class="tag tag-green">🔄 Automação Geral</span>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <p class="section-label">Por que NexFlow?</p>
+  <h2 class="section-title">Projetado para quem<br/>já usa n8n</h2>
+  <p class="section-sub">
+    Estes não são templates básicos de tutorial. São fluxos que resolvem
+    problemas reais de negócios — construídos e refinados em ambiente de produção.
+  </p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Importe em 30 Segundos</div>
+      <div class="feature-text">Cada fluxo é um .json padrão n8n. Importa, ajusta as credenciais e está a funcionar. Sem código extra.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧪</div>
+      <div class="feature-title">Testados em Produção</div>
+      <div class="feature-text">Não são rascunhos de demonstração. Todos os fluxos foram executados em ambientes reais e validados para estabilidade.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <div class="feature-title">Multi-plataforma</div>
+      <div class="feature-text">IA, redes sociais, bases de dados, CRM, e-mail — cobrimos mais de 11 plataformas essenciais para o negócio moderno.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <div class="feature-title">Actualizações Incluídas</div>
+      <div class="feature-text">Novos fluxos são adicionados ao kit regularmente. Compradores existentes recebem as actualizações sem custo adicional.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📁</div>
+      <div class="feature-title">Organizados por Categoria</div>
+      <div class="feature-text">Arquivo bem estruturado: encontra rapidamente o fluxo certo para a sua necessidade sem perder tempo a pesquisar.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💡</div>
+      <div class="feature-title">Use como Base</div>
+      <div class="feature-text">Modifique, combine e expanda os fluxos para criar as suas próprias automações personalizadas com uma base sólida.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section>
+  <p class="section-label">Comparação de Mercado</p>
+  <h2 class="section-title">Preço justo e competitivo</h2>
+  <p class="section-sub">
+    Analisámos os principais vendedores globais de templates n8n. Um único fluxo
+    nos marketplaces internacionais custa entre $15–$49 USD. Oferecemos +1500 fluxos
+    por um único pagamento acessível.
+  </p>
+  <div class="comparison">
+    <div class="cmp-head">
+      <div>O que compras</div>
+      <div>Mercado Internacional</div>
+      <div class="highlight">NexFlow Kit PRO</div>
+    </div>
+    <div class="cmp-row">
+      <div class="col1">Fluxos incluídos</div>
+      <div>1 template por compra</div>
+      <div class="yes">+1500 fluxos</div>
+    </div>
+    <div class="cmp-row">
+      <div class="col1">Preço médio</div>
+      <div>$19 – $49 USD cada</div>
+      <div class="yes">Pagamento único</div>
+    </div>
+    <div class="cmp-row">
+      <div class="col1">Testados em produção</div>
+      <div class="no">Nem sempre</div>
+      <div class="yes">✓ Garantido</div>
+    </div>
+    <div class="cmp-row">
+      <div class="col1">Actualizações futuras</div>
+      <div class="no">Pago à parte</div>
+      <div class="yes">✓ Incluídas</div>
+    </div>
+    <div class="cmp-row">
+      <div class="col1">Suporte local</div>
+      <div class="no">✗ Não disponível</div>
+      <div class="yes">✓ Email + WhatsApp</div>
+    </div>
+    <div class="cmp-row">
+      <div class="col1">Multi-categoria</div>
+      <div class="no">Nicho específico</div>
+      <div class="yes">✓ 11+ plataformas</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="comprar" class="pricing-section">
+  <div class="pricing-inner">
+    <p class="section-label" style="text-align:center">Adquira Hoje</p>
+    <h2 class="section-title" style="text-align:center">Escolha o seu plano</h2>
+    <p class="section-sub" style="margin:0 auto; text-align:center">
+      Acesso imediato após o pagamento. Sem assinatura. Sem surpresas.
+    </p>
+
+    <div class="price-card">
+      <div class="price-badge">MAIS POPULAR · KIT COMPLETO</div>
+      <div class="price-name">Kit Templates PRO</div>
+      <div class="price-desc">Todos os +1500 fluxos n8n + actualizações futuras</div>
+
+      <div class="price-amount"><sup>MT</sup>2,800</div>
+      <div class="price-once">pagamento único · acesso vitalício</div>
+      <div class="price-compare">Valor no mercado global: $49 × 1 template = $49 USD por apenas 1 fluxo</div>
+
+      <ul class="price-features">
+        <li><strong>+1500 fluxos n8n</strong> prontos para importar</li>
+        <li>Organizados por categoria: IA, WhatsApp, Email, e mais</li>
+        <li>Ficheiros .json standard — compatíveis com qualquer instância n8n</li>
+        <li>Actualizações incluídas sem custo extra</li>
+        <li>Suporte por email para dúvidas de instalação</li>
+        <li>Download imediato após confirmação de pagamento</li>
+      </ul>
+
+      <button class="btn-buy" onclick="document.getElementById('checkout-form').scrollIntoView({behavior:'smooth'})">
+        Comprar Agora — MT 2,800 →
+      </button>
+
+      <p class="price-guarantee">
+        <span>✓</span> Pagamento 100% seguro · Acesso imediato ao download
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKOUT FORM -->
+<section id="checkout-form" style="padding: 4rem 5%;">
+  <div style="max-width: 480px; margin: 0 auto;">
+    <p class="section-label">Finalizar Compra</p>
+    <h2 class="section-title">Complete o seu pedido</h2>
+    <p class="section-sub" style="margin-bottom: 2rem;">
+      Preencha os seus dados. Receberá um email de confirmação com o link de download.
+    </p>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; display:flex; flex-direction:column; gap:1rem;">
+      <div>
+        <label style="display:block; font-size:0.78rem; color:var(--muted); font-family:'DM Mono',monospace; letter-spacing:0.1em; margin-bottom:0.5rem;">NOME COMPLETO</label>
+        <input type="text" placeholder="O seu nome" style="width:100%; background:var(--bg); border:1px solid var(--border-bright); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-bright)'" />
+      </div>
+      <div>
+        <label style="display:block; font-size:0.78rem; color:var(--muted); font-family:'DM Mono',monospace; letter-spacing:0.1em; margin-bottom:0.5rem;">EMAIL</label>
+        <input type="email" placeholder="o.seu@email.com" style="width:100%; background:var(--bg); border:1px solid var(--border-bright); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-bright)'" />
+      </div>
+      <div>
+        <label style="display:block; font-size:0.78rem; color:var(--muted); font-family:'DM Mono',monospace; letter-spacing:0.1em; margin-bottom:0.5rem;">MÉTODO DE PAGAMENTO</label>
+        <select style="width:100%; background:var(--bg); border:1px solid var(--border-bright); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; appearance:none; cursor:pointer;">
+          <option>M-Pesa</option>
+          <option>e-Mola</option>
+          <option>Transferência Bancária</option>
+          <option>Cartão Internacional (Visa/MC)</option>
+        </select>
+      </div>
+      <button class="btn-buy" style="margin-top:0.5rem;">
+        Confirmar Compra — MT 2,800 →
+      </button>
+      <p style="text-align:center; font-size:0.76rem; color:var(--muted); font-family:'DM Mono',monospace;">
+        🔒 Os seus dados estão protegidos · Acesso via email em minutos
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section>
+  <div class="support-section">
+    <p class="section-label" style="text-align:center">Suporte</p>
+    <h2 class="section-title" style="text-align:center">Estamos aqui<br/>para ajudar</h2>
+    <p class="section-sub" style="margin:0 auto; text-align:center">
+      O NexFlow oferece suporte dedicado por email para questões técnicas,
+      dúvidas sobre os fluxos e configuração. O WhatsApp é exclusivamente para
+      suporte rápido — não realizamos vendas por lá.
+    </p>
+
+    <div class="support-cards">
+      <div class="support-card">
+        <div class="support-card-head">
+          <div class="support-card-icon icon-email">📧</div>
+          <div class="support-card-label">Email — Canal Principal</div>
+        </div>
+        <div class="support-card-sub">
+          Para suporte técnico, dúvidas sobre fluxos, configuração e
+          acesso ao kit. Respondemos em até 24 horas.
+        </div>
+        <a href="mailto:suporte@nexflow.co.mz" class="support-card-cta">
+          suporte@nexflow.co.mz →
+        </a>
+      </div>
+
+      <div class="support-card">
+        <div class="support-card-head">
+          <div class="support-card-icon icon-wa">💬</div>
+          <div class="support-card-label">WhatsApp — Só Suporte</div>
+        </div>
+        <div class="support-card-sub">
+          WhatsApp disponível <strong>apenas</strong> para dúvidas
+          rápidas pós-compra. Não processamos pagamentos via WhatsApp.
+        </div>
+        <span style="display:inline-block; margin-top:0.9rem; font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted);">
+          ⚠️ Compras somente pelo site
+        </span>
+      </div>
+    </div>
+
+    <div class="support-note">
+      <strong>📌 Importante:</strong> Todas as compras são processadas exclusivamente através
+      desta página. Não enviamos links de pagamento pelo WhatsApp nem por mensagem directa.
+      Se receber uma oferta por outra via, não é NexFlow.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <p class="section-label">FAQ</p>
+  <h2 class="section-title">Perguntas frequentes</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">O que são exactamente estes templates?</button>
+      <div class="faq-a">São ficheiros .json que se importam directamente no n8n (File → Import Workflow). Cada ficheiro contém um fluxo completo — nodes, ligações e lógica — que só precisa das suas credenciais para funcionar.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Preciso de conhecimentos avançados de n8n?</button>
+      <div class="faq-a">Os fluxos são destinados a quem já tem experiência básica com n8n — sabe importar fluxos e configurar credenciais. Não são para iniciantes absolutos, mas qualquer utilizador n8n competente consegue usá-los imediatamente.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Funcionam na versão self-hosted e na cloud?</button>
+      <div class="faq-a">Sim. Os fluxos são compatíveis com n8n self-hosted (Community Edition) e n8n Cloud. Qualquer instância com versão recente do n8n pode importar os ficheiros sem problema.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Como recebo o kit após o pagamento?</button>
+      <div class="faq-a">Após confirmação do pagamento, recebe um email no endereço fornecido com o link de download. O processo é automático e leva tipicamente entre 5 a 30 minutos.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">As actualizações estão mesmo incluídas?</button>
+      <div class="faq-a">Sim. Continuamos a adicionar novos fluxos ao kit. Compradores existentes recebem acesso às actualizações via email sem qualquer custo adicional.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Posso usar os fluxos para clientes meus?</button>
+      <div class="faq-a">A licença é pessoal/comercial — pode usar os fluxos nos seus próprios projetos e nos dos seus clientes. Não pode revender o kit nem redistribuir os ficheiros directamente.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">NexFlow</div>
+  <div class="footer-links">
+    <a href="#fluxos">Fluxos</a>
+    <a href="#comprar">Preços</a>
+    <a href="mailto:suporte@nexflow.co.mz">Contacto</a>
+  </div>
+  <div class="footer-copy">
+    © 2026 NexFlow · Moçambique · suporte@nexflow.co.mz · Todos os direitos reservados
+  </div>
+</footer>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Smooth reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card, .stat-item, .faq-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
